@@ -16,6 +16,7 @@ clean:
 prepare:
 	mkdir -p ~/build
 	cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git
+	cp -f ~/build/C-Thread-Pool/thpool.h include/thpool.h
 
 install:
 	cd ./src && sudo $(MAKE) install
