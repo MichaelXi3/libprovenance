@@ -4,7 +4,7 @@ OUT = libprovenance.so
 INCLUDES = -I../include
 CCFLAGS = -g -O2 -fpic
 CCC = gcc
-LDFLAGS = -Wl,--whole-archive ../threadpool/thpool.a -Wl,--no-whole-archive -shared
+LDFLAGS = -Wl,--whole-archive thpool.a -Wl,--no-whole-archive -shared
 
 .SUFFIXES: .c
 

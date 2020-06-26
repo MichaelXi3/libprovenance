@@ -20,6 +20,7 @@ prepare:
 	ls ~/build/C-Thread-Pool
 	ls threadpool
 	stat threadpool/thpool.a
+	mv -f threadpool/thpool.a src/thpool.a
 
 install:
 	cd ./src && sudo $(MAKE) install
