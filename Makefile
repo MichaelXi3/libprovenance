@@ -5,7 +5,6 @@ update_commit:
 	ruby ./scripts/commit.rb
 
 all: update_commit clean
-	cd ./threadpool && $(MAKE) all
 	cd ./src && $(MAKE) all
 
 clean:
@@ -17,6 +16,8 @@ prepare:
 	mkdir -p ~/build
 	cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git
 	cp -f ~/build/C-Thread-Pool/thpool.h include/thpool.h
+	cd ./threadpool && $(MAKE) all
+	cp -f ~/build/C-Thread-Pool/thpool.a src/thpool.a
 
 install:
 	cd ./src && sudo $(MAKE) install
