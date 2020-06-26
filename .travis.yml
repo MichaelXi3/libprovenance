@@ -7,9 +7,6 @@ before_install:
   - sudo apt-get install ruby
 
 script:
-  - ls ~/build
-  - ls ~/build/uthash
-  - ls ~/build/uthash/src
   - make travis BRANCH=$TRAVIS_BRANCH
 
 
