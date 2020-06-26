@@ -5,7 +5,6 @@ INCLUDES = -I~/build/C-Thread-Pool
 CCFLAGS = -g -O2 -fpic
 CCC = gcc
 LDFLAGS = -g
-GIT_SOURCE=https://github.com/Pithikos/C-Thread-Pool.git
 
 .SUFFIXES: .c
 
