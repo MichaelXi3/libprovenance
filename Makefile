@@ -14,8 +14,9 @@ clean:
 	rm -rf output
 
 prepare:
-	cd ./threadpool && $(MAKE) prepare
-	cd ./uthash && $(MAKE) prepare
+	mkdir -p ~/build
+	cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git
+	cd ~/build && git clone https://github.com/troydhanson/uthash.git
 
 install:
 	cd ./src && sudo $(MAKE) install

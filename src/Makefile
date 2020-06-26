@@ -1,10 +1,10 @@
 SRC = libprovenance.c provenanceW3CJSON.c provenanceSPADEJSON.c provenanceutils.c provenancefilter.c relay.c
 OBJ = $(SRC:.c=.o)
 OUT = libprovenance.so
-INCLUDES = -I../threadpool -I../include -I../uthash/uthash/src
+INCLUDES = -I~/build/C-Thread-Pool -I../include -I~/build/uthash/src
 CCFLAGS = -g -O2 -fpic
 CCC = gcc
-LDFLAGS = -Wl,--whole-archive ../threadpool/thpool.a -Wl,--no-whole-archive -shared
+LDFLAGS = -Wl,--whole-archive ~/build/C-Thread-Pool/thpool.a -Wl,--no-whole-archive -shared
 
 .SUFFIXES: .c
 
