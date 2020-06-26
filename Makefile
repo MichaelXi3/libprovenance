@@ -16,10 +16,6 @@ clean:
 prepare:
 	mkdir -p ~/build
 	cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git
-	cd ~/build && git clone https://github.com/troydhanson/uthash.git
-	ls ~/build
-	ls ~/build/uthash
-	ls ~/build/uthash/src
 
 install:
 	cd ./src && sudo $(MAKE) install

@@ -27,10 +27,11 @@
 #include <pwd.h>
 #include <grp.h>
 #include <linux/provenance_types.h>
+#include <uthash.h>
 
 #include "provenance.h"
 #include "provenanceutils.h"
-#include "uthash.h"
+
 
 static inline int __set_boolean(bool value, const char* name){
   int rc;
