@@ -14,7 +14,7 @@ clean:
 
 prepare:
 	mkdir -p ~/build
-	cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git
+	test -d ~/build/C-Thread-Pool || (cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git)
 	cp -f ~/build/C-Thread-Pool/thpool.h include/thpool.h
 	cd threadpool && $(MAKE) all
 
