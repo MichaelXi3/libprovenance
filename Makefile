@@ -1,4 +1,4 @@
-version=0.4.11
+version=0.5.0
 BRANCH?=dev
 
 update_commit:

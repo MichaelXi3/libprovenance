@@ -47,6 +47,7 @@
 
 ### v0.5.0
 ```
+- Record secctx for stack in SPADE format similar to W3C output (bug fix).
 - Change where dependencies are built.
 ```
 
