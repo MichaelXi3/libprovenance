@@ -195,6 +195,8 @@ char* task_to_spade_json(struct task_prov_struct* n) {
   __add_uint64_attribute("rbytes", n->rbytes, true);
   __add_uint64_attribute("wbytes", n->wbytes, true);
   __add_uint64_attribute("cancel_wbytes", n->cancel_wbytes, true);
+  provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
+  __add_string_attribute("secctx", secctx, true);
   NODE_END();
   return buffer;
 }

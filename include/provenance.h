@@ -29,13 +29,13 @@
 #define str(s) # s
 
 #define PROVLIB_VERSION_MAJOR 0
-#define PROVLIB_VERSION_MINOR 4
-#define PROVLIB_VERSION_PATCH 11
+#define PROVLIB_VERSION_MINOR 5
+#define PROVLIB_VERSION_PATCH 0
 #define PROVLIB_VERSION_STR   "v"xstr(PROVLIB_VERSION_MAJOR)\
     "."xstr(PROVLIB_VERSION_MINOR)\
     "."xstr(PROVLIB_VERSION_PATCH)\
 
-#define PROVLIB_COMMIT "c64f4a04df866e58b2e36203b9b91b70eebbbcc0"
+#define PROVLIB_COMMIT "d9faa57aeb46645604402ccc3dd960c871998482"
 
 struct provenance_ops{
   void (*init)(void);

@@ -1,11 +1,10 @@
-SRC = ./build/thpool.c
+SRC = ~/build/C-Thread-Pool/thpool.c
 OBJ = $(SRC:.c=.o)
 OUT = thpool.a
-INCLUDES = -I./build
+INCLUDES = -I~/build/C-Thread-Pool
 CCFLAGS = -g -O2 -fpic
 CCC = gcc
 LDFLAGS = -g
-GIT_SOURCE=https://github.com/Pithikos/C-Thread-Pool.git
 
 .SUFFIXES: .c
 
@@ -21,8 +20,3 @@ $(OUT): $(OBJ)
 
 clean:
 	rm -f $(OBJ) $(OUT) $(DYN)
-
-prepare:
-	mkdir -p build
-	cd ./build && git init && git remote add origin $(GIT_SOURCE) && git fetch origin && git checkout -b master --track origin/master
-	cp --force ./build/thpool.h ./thpool.h

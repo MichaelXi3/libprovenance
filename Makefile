@@ -1,11 +1,10 @@
-version=0.4.11
+version=0.5.0
 BRANCH?=dev
 
 update_commit:
 	ruby ./scripts/commit.rb
 
-all: update_commit clean
-	cd ./threadpool && $(MAKE) all
+all: update_commit
 	cd ./src && $(MAKE) all
 
 clean:
@@ -14,8 +13,10 @@ clean:
 	rm -rf output
 
 prepare:
-	cd ./threadpool && $(MAKE) prepare
-	cd ./uthash && $(MAKE) prepare
+	mkdir -p ~/build
+	test -d ~/build/C-Thread-Pool || (cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git)
+	cp -f ~/build/C-Thread-Pool/thpool.h include/thpool.h
+	cd threadpool && $(MAKE) all
 
 install:
 	cd ./src && sudo $(MAKE) install
@@ -58,7 +59,7 @@ travis_update_files: travis_checkout_dev
 travis: travis_update_files prepare all install
 
 publish_rpm:
-	cd ./output && package_cloud push camflow/provenance/fedora/31 libprovenance-$(version)-1.x86_64.rpm
+	cd ./output && package_cloud push camflow/provenance/fedora/32 libprovenance-$(version)-1.x86_64.rpm
 
 publish_deb:
 	cd ./output && package_cloud push camflow/provenance/ubuntu/bionic libprovenance_$(version)-2_amd64.deb

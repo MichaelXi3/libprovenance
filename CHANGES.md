@@ -2,6 +2,7 @@
 
 | Library version | Date       |
 | --------------- | ---------- |
+| 0.5.0           | 09/07/2020 |
 | 0.4.11          | 23/03/2020 |
 | 0.4.10          | 30/01/2020 |
 | 0.4.9           | 23/08/2019 |
@@ -43,6 +44,12 @@
 | 0.1.2           | 26/05/2016 |
 | 0.1.1           | 03/04/2016 |
 | 0.1.0           | 28/03/2016 |
+
+### v0.5.0
+```
+- Record secctx for stack in SPADE format similar to W3C output (bug fix).
+- Change where dependencies are built.
+```
 
 ### v0.4.11
 ```

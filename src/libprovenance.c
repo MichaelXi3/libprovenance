@@ -27,10 +27,11 @@
 #include <pwd.h>
 #include <grp.h>
 #include <linux/provenance_types.h>
+#include <uthash.h>
 
 #include "provenance.h"
 #include "provenanceutils.h"
-#include "uthash.h"
+
 
 static inline int __set_boolean(bool value, const char* name){
   int rc;
@@ -587,6 +588,9 @@ int provenance_secid_to_secctx( uint32_t secid, char* secctx, uint32_t len){
   struct secinfo info;
   int rc = 0;
   int fd;
+
+  if(secid==0) // nothing to do
+    return 0;
 
   if( sec_find_entry(secid, secctx) )
     return 0;
