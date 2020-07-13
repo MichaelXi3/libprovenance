@@ -589,9 +589,6 @@ int provenance_secid_to_secctx( uint32_t secid, char* secctx, uint32_t len){
   int rc = 0;
   int fd;
 
-  if(secid==0) // nothing to do
-    return 0;
-
   if( sec_find_entry(secid, secctx) )
     return 0;
   fd = open(PROV_SECCTX, O_RDONLY);
