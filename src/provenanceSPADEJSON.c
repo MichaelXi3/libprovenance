@@ -208,6 +208,7 @@ char* inode_to_spade_json(struct inode_prov_struct* n) {
   __add_uint32_attribute("uid", n->uid, true);
   __add_uint32_attribute("gid", n->gid, true);
   __add_uint32hex_attribute("mode", n->mode, true);
+  provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   __add_string_attribute("secctx", secctx, true);
   __add_uint32_attribute("ino", n->ino, true);
   __add_string_attribute("uuid", uuid_to_str(n->sb_uuid, uuid, UUID_STR_SIZE), true);
