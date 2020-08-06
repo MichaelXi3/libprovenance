@@ -367,38 +367,35 @@ int fprovenance_propagate_file(int fd, bool propagate){
   return fprovenance_track_file(fd, propagate);
 }
 
-int provenance_label_file(const char path[PATH_MAX], const char *label){
+int provenance_taint_file(const char path[PATH_MAX], uint64_t taint){
   union prov_elt prov;
-  uint64_t taint = generate_label(label);
   int rc;
   rc = provenance_read_file(path, &prov);
   if(rc<0)
     return rc;
-  prov_bloom_add(prov_taint(&prov), taint);
+  provenance_taint_merge(prov_taint(&prov), taint);
   return __provenance_write_file(path, &prov);
 }
 
-int fprovenance_label_file(int fd, const char *label){
+int fprovenance_taint_file(int fd, uint64_t taint){
   union prov_elt prov;
-  uint64_t taint = generate_label(label);
   int rc;
   rc = fprovenance_read_file(fd, &prov);
   if(rc<0)
     return rc;
-  prov_bloom_add(prov_taint(&prov), taint);
+  provenance_taint_merge(prov_taint(&prov), taint);
   return __fprovenance_write_file(fd, &prov);
 }
 
-int provenance_label(const char *label){
+int provenance_taint(uint64_t taint){
   struct prov_process_config cfg;
-  uint64_t taint = generate_label(label);
   int rc;
   int fd = open(PROV_SELF_FILE, O_WRONLY);
   if( fd < 0 )
     return fd;
   memset(&cfg, 0, sizeof(struct prov_process_config));
   cfg.op=PROV_SET_TAINT;
-  prov_bloom_add(prov_taint(&(cfg.prov)), taint);
+  provenance_taint_merge(prov_taint(&(cfg.prov)), taint);
 
   rc = write(fd, &cfg, sizeof(struct prov_process_config));
   close(fd);
@@ -451,9 +448,8 @@ int provenance_propagate_process(uint32_t pid, bool propagate){
   return provenance_track_process(pid, propagate);
 }
 
-int provenance_label_process(uint32_t pid, const char *label){
+int provenance_taint_process(uint32_t pid, uint64_t taint){
   struct prov_process_config cfg;
-  uint64_t taint = generate_label(label);
   int rc;
   int fd = open(PROV_PROCESS_FILE, O_WRONLY);
   if( fd < 0 )
@@ -461,7 +457,7 @@ int provenance_label_process(uint32_t pid, const char *label){
   memset(&cfg, 0, sizeof(struct prov_process_config));
   cfg.vpid=pid;
   cfg.op=PROV_SET_TAINT;
-  prov_bloom_add(prov_taint(&(cfg.prov)), taint);
+  provenance_taint_merge(prov_taint(&(cfg.prov)), taint);
 
   rc = write(fd, &cfg, sizeof(struct prov_process_config));
   close(fd);

@@ -22,7 +22,6 @@
 #include <sys/socket.h>
 #include <linux/provenance.h>
 #include <linux/provenance_fs.h>
-#include <linux/provenance_utils.h>
 #include <linux/provenance_types.h>
 
 #define xstr(s) str(s)
@@ -35,7 +34,7 @@
     "."xstr(PROVLIB_VERSION_MINOR)\
     "."xstr(PROVLIB_VERSION_PATCH)\
 
-#define PROVLIB_COMMIT "96e20766780a82a7a2fb2f5f51f7f41a1618922c"
+#define PROVLIB_COMMIT "ecaa79a27103a73e16b270a2dd62f58acf3201e9"
 
 struct provenance_ops{
   void (*init)(void);
@@ -197,9 +196,9 @@ int provenance_set_propagate(bool v);
 bool provenance_get_propagate(void);
 
 /*
-* apply label to current process.
+* apply taint to current process.
 */
-int provenance_label(const char *label);
+int provenance_taint(uint64_t taint);
 
 /*
 * @v uint32_t value
@@ -318,17 +317,17 @@ int fprovenance_propagate_file(int fd, bool propagate);
 
 /*
 * @name file name
-* @label label to be applied to the file
-* add label to the file corresponding to name
+* @taint taint to be applied to the file
+* add taint to the file corresponding to name
 */
-int provenance_label_file(const char name[PATH_MAX], const char *label);
+int provenance_taint_file(const char name[PATH_MAX], uint64_t taint);
 
 /*
 * @fd file descriptor
-* @label label to be applied to the file
-* add label to the file corresponding to fd
+* @taint taint to be applied to the file
+* add taint to the file corresponding to fd
 */
-int fprovenance_label_file(int fd, const char *label);
+int fprovenance_taint_file(int fd, uint64_t taint);
 
 /*
 * @pid process pid
@@ -353,7 +352,7 @@ int provenance_opaque_process(uint32_t pid, bool opaque);
 
 int provenance_propagate_process(uint32_t pid, bool propagate);
 
-int provenance_label_process(uint32_t pid, const char *label);
+int provenance_taint_process(uint32_t pid, uint64_t taint);
 
 int provenance_ingress_ipv4_track(const char* param);
 int provenance_ingress_ipv4_propagate(const char* param);
