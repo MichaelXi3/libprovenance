@@ -585,6 +585,9 @@ int provenance_secid_to_secctx( uint32_t secid, char* secctx, uint32_t len){
   int rc = 0;
   int fd;
 
+  // make sure empty string is returned on error
+  secctx[0]='\0';
+  
   if( sec_find_entry(secid, secctx) )
     return 0;
   fd = open(PROV_SECCTX, O_RDONLY);
@@ -595,7 +598,6 @@ int provenance_secid_to_secctx( uint32_t secid, char* secctx, uint32_t len){
   rc = read(fd, &info, sizeof(struct secinfo));
   close(fd);
   if(rc<0){
-    secctx[0]='\0';
     return rc;
   }
   if(len<strlen(info.secctx))
