@@ -592,18 +592,22 @@ int provenance_secid_to_secctx( uint32_t secid, char* secctx, uint32_t len){
     return 0;
   fd = open(PROV_SECCTX, O_RDONLY);
   if( fd < 0 )
-    return fd;
+    goto out;
   memset(&info, 0, sizeof(struct secinfo));
   info.secid=secid;
   rc = read(fd, &info, sizeof(struct secinfo));
   close(fd);
   if(rc<0){
-    return rc;
+    goto out;
   }
   if(len<strlen(info.secctx))
     return -ENOMEM;
   strncpy(secctx, info.secctx, len);
   sec_add_entry(secid, secctx);
+out:
+  if(secctx[0]=='\0') {
+    utoa(secid, secctx, HEX);
+  }
   return rc;
 }
 
