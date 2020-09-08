@@ -587,7 +587,7 @@ int provenance_secid_to_secctx( uint32_t secid, char* secctx, uint32_t len){
 
   // make sure empty string is returned on error
   secctx[0]='\0';
-  
+
   if( sec_find_entry(secid, secctx) )
     return 0;
   fd = open(PROV_SECCTX, O_RDONLY);
@@ -650,24 +650,28 @@ static inline int provenance_type_id_to_str(uint64_t id,
   int rc;
   int fd;
 
+  name[0]='\0';
+
   if( type_find_entry(id, name) )
     return 0;
   fd = open(PROV_TYPE, O_RDONLY);
   if( fd < 0 )
-    return fd;
+    goto out;
   memset(&info, 0, sizeof(struct prov_type));
   info.id=id;
   info.is_relation = is_relation;
   rc = read(fd, &info, sizeof(struct prov_type));
   close(fd);
-  if(rc<0){
-    name[0]='\0';
-    return rc;
-  }
+  if(rc<0)
+    goto out;
   if(len<strlen(info.str))
     return -ENOMEM;
   strncpy(name, info.str, len);
   type_add_entry(id, name);
+out:
+  if(name[0]=='\0') {
+      ulltoa(id, name, HEX)
+  }
   return rc;
 }
 
