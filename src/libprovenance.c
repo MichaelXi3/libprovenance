@@ -670,7 +670,7 @@ static inline int provenance_type_id_to_str(uint64_t id,
   type_add_entry(id, name);
 out:
   if(name[0]=='\0') {
-      ulltoa(id, name, HEX)
+      ulltoa(id, name, HEX);
   }
   return rc;
 }
