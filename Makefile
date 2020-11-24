@@ -13,7 +13,6 @@ clean:
 	rm -rf output
 
 prepare:
-	git pull --recurse-submodules
 	mkdir -p ~/build
 	test -d ~/build/C-Thread-Pool || (cp -R ./C-Thread-Pool ~/build/C-Thread-Pool)
 	cd threadpool && $(MAKE) all
