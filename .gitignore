@@ -38,5 +38,3 @@
 
 *.rpm
 *.deb
-
-include/thpool.h

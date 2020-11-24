@@ -13,9 +13,9 @@ clean:
 	rm -rf output
 
 prepare:
+	git pull --recurse-submodules
 	mkdir -p ~/build
-	test -d ~/build/C-Thread-Pool || (cd ~/build && git clone https://github.com/Pithikos/C-Thread-Pool.git)
-	cp -f ~/build/C-Thread-Pool/thpool.h include/thpool.h
+	test -d ~/build/C-Thread-Pool || (cd ~/build && cp -R C-Thread-Pool ~/build/C-Thread-Pool)
 	cd threadpool && $(MAKE) all
 
 install:
