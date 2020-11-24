@@ -15,7 +15,7 @@ clean:
 prepare:
 	git pull --recurse-submodules
 	mkdir -p ~/build
-	test -d ~/build/C-Thread-Pool || (cd ~/build && cp -R C-Thread-Pool ~/build/C-Thread-Pool)
+	test -d ~/build/C-Thread-Pool || (cp -R ./C-Thread-Pool ~/build/C-Thread-Pool)
 	cd threadpool && $(MAKE) all
 
 install:
