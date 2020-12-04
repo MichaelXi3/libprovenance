@@ -580,6 +580,7 @@ char* packet_to_json(struct pck_struct* p){
   __add_string_attribute("prov:type", "packet", true);
   __add_uint64hex_attribute("cf:taint", p->taint, true);
   __add_uint64_attribute("cf:jiffies", p->jiffies, true);
+  __add_uint32_attribute("cf:len", p->len, true);
   strncat(buffer, ",\"prov:label\":\"[packet] ", BUFFER_LENGTH-1);
   __add_ipv4(p->identifier.packet_id.snd_ip, p->identifier.packet_id.snd_port);
   strncat(buffer, "->", BUFFER_LENGTH-1);

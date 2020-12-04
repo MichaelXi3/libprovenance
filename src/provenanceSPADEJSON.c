@@ -253,6 +253,7 @@ char* packet_to_spade_json(struct pck_struct* n) {
   __add_ipv4_attribute("sender", n->identifier.packet_id.snd_ip, n->identifier.packet_id.snd_port, true);
   __add_ipv4_attribute("receiver", n->identifier.packet_id.rcv_ip, n->identifier.packet_id.rcv_port, true);
   __add_uint64_attribute("jiffies", n->jiffies, true);
+  __add_uint32_attribute("ih_len", n->len, true);
   NODE_END();
   return buffer;
 }
