@@ -50,6 +50,7 @@
 
 ### v0.5.3
 ```
+- Record packet length.
 - Change how taints are handled.
 - Remove duplicate option.
 ```
