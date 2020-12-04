@@ -50,6 +50,7 @@
 
 ### v0.5.3
 ```
+- Added dirty fix to handle back slash in path name in SPADE JSON output.
 - Record packet length.
 - Change how taints are handled.
 - Remove duplicate option.
