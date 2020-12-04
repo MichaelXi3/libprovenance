@@ -683,6 +683,7 @@ char* pathname_to_json(struct file_name_struct* n){
   int i;
   NODE_PREP_IDs(n);
   __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
+  // dirty fix
   for(i=0; i<n->length; i++){
     if(n->name[i]=='\\')
       n->name[i]='/';

@@ -314,7 +314,13 @@ char* addr_to_spade_json(struct address_struct* n) {
 }
 
 char* pathname_to_spade_json(struct file_name_struct* n) {
+  int i;
   NODE_START("Entity");
+  // dirty fix
+  for(i=0; i<n->length; i++){
+    if(n->name[i]=='\\')
+      n->name[i]='/';
+  }
   __add_string_attribute("pathname", n->name, true);
   NODE_END();
   return buffer;
