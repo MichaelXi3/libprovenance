@@ -2,6 +2,7 @@
 
 | Library version | Date       |
 | --------------- | ---------- |
+| 0.5.3           | 05/12/2020 |
 | 0.5.2           | 14/07/2020 |
 | 0.5.1           | 11/07/2020 |
 | 0.5.0           | 09/07/2020 |
@@ -46,6 +47,15 @@
 | 0.1.2           | 26/05/2016 |
 | 0.1.1           | 03/04/2016 |
 | 0.1.0           | 28/03/2016 |
+
+### v0.5.3
+```
+- Added dirty fix to handle back slash in path name in SPADE JSON output.
+- Record packet length.
+- Change how taints are handled.
+- Remove duplicate option.
+- Support Fedora 33.
+```
 
 ### v0.5.2
 ```

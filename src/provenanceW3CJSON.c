@@ -285,7 +285,6 @@ static __thread char id[PROV_ID_STR_LEN];
 static __thread char sender[PROV_ID_STR_LEN];
 static __thread char receiver[PROV_ID_STR_LEN];
 static __thread char parent_id[PROV_ID_STR_LEN];
-static __thread char taint[PATH_MAX];
 
 #define RELATION_PREP_IDs(e) ID_ENCODE(e->identifier.buffer, PROV_IDENTIFIER_BUFFER_LENGTH, id, PROV_ID_STR_LEN);\
                         ID_ENCODE(e->snd.buffer, PROV_IDENTIFIER_BUFFER_LENGTH, sender, PROV_ID_STR_LEN);\
@@ -297,13 +296,6 @@ static __thread char taint[PATH_MAX];
 #define NODE_PREP_IDs(n) ID_ENCODE(n->identifier.buffer, PROV_IDENTIFIER_BUFFER_LENGTH, id, PROV_ID_STR_LEN)
 
 #define PACKET_PREP_IDs(p) ID_ENCODE(p->identifier.buffer, PROV_IDENTIFIER_BUFFER_LENGTH, id, PROV_ID_STR_LEN)
-
-
-static inline void prov_prep_taint(union prov_elt *n){
-  taint[0]='\0';
-  if (!prov_bloom_empty(prov_taint(n)))
-    TAINT_ENCODE(prov_taint(n), PROV_N_BYTES, taint, TAINT_STR_LEN);
-}
 
 static inline void __init_json_entry(const char* id)
 {
@@ -358,13 +350,13 @@ static inline void __node_identifier(const struct node_identifier* n){
 
 static inline void __node_start(const char* id,
                                 const struct node_identifier* n,
-                                const char* taint,
+                                uint64_t taint,
                                 uint64_t jiffies,
                                 uint8_t epoch){
   __init_json_entry(id);
   __node_identifier(n);
   __add_date_attribute(true);
-  __add_string_attribute("cf:taint", taint, true);
+  __add_uint64hex_attribute("cf:taint", taint, true);
   __add_uint64_attribute("cf:jiffies", jiffies, true);
   __add_uint32_attribute("cf:epoch", epoch, true);
 }
@@ -378,11 +370,9 @@ static inline void __relation_identifier(const struct relation_identifier* e){
 
 static char* __relation_to_json(struct relation_struct* e, const char* snd, const char* rcv){
   RELATION_PREP_IDs(e);
-  prov_prep_taint((union prov_elt*)e);
   __init_json_entry(id);
   __relation_identifier(&(e->identifier.relation_id));
   __add_date_attribute(true);
-  __add_string_attribute("cf:taint", taint, true);
   __add_uint64_attribute("cf:jiffies", e->jiffies, true);
   __add_uint32_attribute("cf:epoch", e->epoch, true);
   __add_label_attribute(NULL, relation_id_to_str(e->identifier.relation_id.type), true);
@@ -427,8 +417,7 @@ char* derived_to_json(struct relation_struct* e){
 
 char* disc_to_json(struct disc_node_struct* n){
   DISC_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_reference("cf:hasParent", parent_id, true);
   if(n->length > 0){
     strncat(buffer, ",", BUFFER_LENGTH-1);
@@ -443,8 +432,7 @@ char* proc_to_json(struct proc_prov_struct* n){
   char secctx[PATH_MAX];
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_uint32_attribute("cf:uid", n->uid, true);
   __add_uint32_attribute("cf:gid", n->gid, true);
   __add_uint32_attribute("cf:tgid", n->tgid, true);
@@ -465,8 +453,7 @@ char* task_to_json(struct task_prov_struct* n){
   char secctx[PATH_MAX];
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_uint32_attribute("cf:pid", n->pid, true);
   __add_uint32_attribute("cf:vpid", n->vpid, true);
   __add_uint64_attribute("cf:utime", n->utime, true);
@@ -498,8 +485,7 @@ char* inode_to_json(struct inode_prov_struct* n){
   char secctx[PATH_MAX];
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_uint32_attribute("cf:uid", n->uid, true);
   __add_uint32_attribute("cf:gid", n->gid, true);
   __add_uint32hex_attribute("cf:mode", n->mode, true);
@@ -514,8 +500,7 @@ char* inode_to_json(struct inode_prov_struct* n){
 char* iattr_to_json(struct iattr_prov_struct* n){
   char tmp[65];
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_uint32hex_attribute("cf:valid", n->valid, true);
   __add_uint32hex_attribute("cf:mode", n->mode, true);
   __add_uint32_attribute("cf:uid", n->uid, true);
@@ -531,8 +516,7 @@ char* iattr_to_json(struct iattr_prov_struct* n){
 
 char* xattr_to_json(struct xattr_prov_struct* n){
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_string_attribute("cf:name", n->name, true);
   if(n->size>0){
     __add_uint32_attribute("cf:size", n->size, true);
@@ -546,8 +530,7 @@ char* xattr_to_json(struct xattr_prov_struct* n){
 char* pckcnt_to_json(struct pckcnt_struct* n){
   char* cntenc;
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   cntenc = malloc( encode64Bound(n->length) );
   base64encode(n->content, n->length, cntenc, encode64Bound(n->length));
   __add_string_attribute("cf:content", cntenc, true);
@@ -565,8 +548,7 @@ char* pckcnt_to_json(struct pckcnt_struct* n){
 char* sb_to_json(struct sb_struct* n){
   char uuid[UUID_STR_SIZE];
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_string_attribute("cf:uuid", uuid_to_str(n->uuid, uuid, UUID_STR_SIZE), true);
   __close_json_entry(buffer);
   return buffer;
@@ -574,16 +556,14 @@ char* sb_to_json(struct sb_struct* n){
 
 char* msg_to_json(struct msg_msg_struct* n){
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __close_json_entry(buffer);
   return buffer;
 }
 
 char* shm_to_json(struct shm_struct* n){
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_uint32hex_attribute("cf:mode", n->mode, true);
   __close_json_entry(buffer);
   return buffer;
@@ -592,15 +572,15 @@ char* shm_to_json(struct shm_struct* n){
 char* packet_to_json(struct pck_struct* p){
   char tmp[256];
   PACKET_PREP_IDs(p);
-  prov_prep_taint((union prov_elt*)p);
   __init_json_entry(id);
   __add_uint32_attribute("cf:id", p->identifier.packet_id.id, false);
   __add_uint32_attribute("cf:seq", p->identifier.packet_id.seq, true);
   __add_ipv4_attribute("cf:sender", p->identifier.packet_id.snd_ip, p->identifier.packet_id.snd_port, true);
   __add_ipv4_attribute("cf:receiver", p->identifier.packet_id.rcv_ip, p->identifier.packet_id.rcv_port, true);
   __add_string_attribute("prov:type", "packet", true);
-  __add_string_attribute("cf:taint", taint, true);
+  __add_uint64hex_attribute("cf:taint", p->taint, true);
   __add_uint64_attribute("cf:jiffies", p->jiffies, true);
+  __add_uint32_attribute("cf:len", p->len, true);
   strncat(buffer, ",\"prov:label\":\"[packet] ", BUFFER_LENGTH-1);
   __add_ipv4(p->identifier.packet_id.snd_ip, p->identifier.packet_id.snd_port);
   strncat(buffer, "->", BUFFER_LENGTH-1);
@@ -615,8 +595,7 @@ char* packet_to_json(struct pck_struct* p){
 char* str_msg_to_json(struct str_struct* n){
   int i=0;
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   for(i=0; i < n->length; i++){
     if(n->str[i]=='"')
       n->str[i]=' ';
@@ -693,8 +672,7 @@ char* sockaddr_to_label(char* buf, size_t blen, struct sockaddr_storage* addr, s
 char* addr_to_json(struct address_struct* n){
   char addr_info[PATH_MAX+1024];
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_json_attribute("cf:address", sockaddr_to_json(addr_info, PATH_MAX+1024, &n->addr, n->length), true);
   __add_label_attribute("address", sockaddr_to_label(addr_info, PATH_MAX+1024, &n->addr, n->length), true);
   __close_json_entry(buffer);
@@ -704,8 +682,8 @@ char* addr_to_json(struct address_struct* n){
 char* pathname_to_json(struct file_name_struct* n){
   int i;
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
+  // dirty fix
   for(i=0; i<n->length; i++){
     if(n->name[i]=='\\')
       n->name[i]='/';
@@ -720,8 +698,7 @@ char* arg_to_json(struct arg_struct* n){
   int i;
   char* tmp;
   NODE_PREP_IDs(n);
-  prov_prep_taint((union prov_elt*)n);
-  __node_start(id, &(n->identifier.node_id), taint, n->jiffies, n->epoch);
+  __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   for(i=0; i<n->length; i++){
     if(n->value[i]=='\\')
       n->value[i]='/';
@@ -750,9 +727,8 @@ char* arg_to_json(struct arg_struct* n){
 
 char* machine_to_json(struct machine_struct* m){
   char tmp[256];
-  PACKET_PREP_IDs(m);
-  prov_prep_taint((union prov_elt*)m);
-  __node_start(id, &(m->identifier.node_id), taint, m->jiffies, m->epoch);
+  NODE_PREP_IDs(m);
+  __node_start(id, &(m->identifier.node_id), m->taint, m->jiffies, m->epoch);
   __add_string_attribute("cf:u_sysname", m->utsname.sysname, true);
   __add_string_attribute("cf:u_nodename", m->utsname.nodename, true);
   __add_string_attribute("cf:u_release", m->utsname.release, true);

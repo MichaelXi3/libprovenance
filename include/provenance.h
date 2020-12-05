@@ -22,7 +22,6 @@
 #include <sys/socket.h>
 #include <linux/provenance.h>
 #include <linux/provenance_fs.h>
-#include <linux/provenance_utils.h>
 #include <linux/provenance_types.h>
 
 #define xstr(s) str(s)
@@ -30,12 +29,12 @@
 
 #define PROVLIB_VERSION_MAJOR 0
 #define PROVLIB_VERSION_MINOR 5
-#define PROVLIB_VERSION_PATCH 2
+#define PROVLIB_VERSION_PATCH 3
 #define PROVLIB_VERSION_STR   "v"xstr(PROVLIB_VERSION_MAJOR)\
     "."xstr(PROVLIB_VERSION_MINOR)\
     "."xstr(PROVLIB_VERSION_PATCH)\
 
-#define PROVLIB_COMMIT "3a8a5adfb4298073eba51683ef7b1d6ab077ac74"
+#define PROVLIB_COMMIT "3ecae0d3fe0396228229e9dd314758235db82638"
 
 struct provenance_ops{
   void (*init)(void);
@@ -197,9 +196,9 @@ int provenance_set_propagate(bool v);
 bool provenance_get_propagate(void);
 
 /*
-* apply label to current process.
+* apply taint to current process.
 */
-int provenance_label(const char *label);
+int provenance_taint(uint64_t taint);
 
 /*
 * @v uint32_t value
@@ -318,17 +317,17 @@ int fprovenance_propagate_file(int fd, bool propagate);
 
 /*
 * @name file name
-* @label label to be applied to the file
-* add label to the file corresponding to name
+* @taint taint to be applied to the file
+* add taint to the file corresponding to name
 */
-int provenance_label_file(const char name[PATH_MAX], const char *label);
+int provenance_taint_file(const char name[PATH_MAX], uint64_t taint);
 
 /*
 * @fd file descriptor
-* @label label to be applied to the file
-* add label to the file corresponding to fd
+* @taint taint to be applied to the file
+* add taint to the file corresponding to fd
 */
-int fprovenance_label_file(int fd, const char *label);
+int fprovenance_taint_file(int fd, uint64_t taint);
 
 /*
 * @pid process pid
@@ -353,7 +352,7 @@ int provenance_opaque_process(uint32_t pid, bool opaque);
 
 int provenance_propagate_process(uint32_t pid, bool propagate);
 
-int provenance_label_process(uint32_t pid, const char *label);
+int provenance_taint_process(uint32_t pid, uint64_t taint);
 
 int provenance_ingress_ipv4_track(const char* param);
 int provenance_ingress_ipv4_propagate(const char* param);

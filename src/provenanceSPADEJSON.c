@@ -90,7 +90,9 @@ static inline void __init_relation(char* type,
 
 #define NODE_START(type) ID_ENCODE(n->identifier.buffer, PROV_IDENTIFIER_BUFFER_LENGTH, id, PROV_ID_STR_LEN);\
                     __init_node(type, id, &(n->identifier.node_id));\
-                    __add_uint32_attribute("epoch", n->epoch, true)
+                    __add_uint64hex_attribute("cf:taint", n->taint, true);\
+                    __add_uint64_attribute("cf:jiffies", n->jiffies, true);\
+                    __add_uint32_attribute("cf:epoch", n->epoch, true);
 
 #define NODE_END() __close_node()
 
@@ -251,6 +253,7 @@ char* packet_to_spade_json(struct pck_struct* n) {
   __add_ipv4_attribute("sender", n->identifier.packet_id.snd_ip, n->identifier.packet_id.snd_port, true);
   __add_ipv4_attribute("receiver", n->identifier.packet_id.rcv_ip, n->identifier.packet_id.rcv_port, true);
   __add_uint64_attribute("jiffies", n->jiffies, true);
+  __add_uint32_attribute("ih_len", n->len, true);
   NODE_END();
   return buffer;
 }
@@ -311,7 +314,13 @@ char* addr_to_spade_json(struct address_struct* n) {
 }
 
 char* pathname_to_spade_json(struct file_name_struct* n) {
+  int i;
   NODE_START("Entity");
+  // dirty fix
+  for(i=0; i<n->length; i++){
+    if(n->name[i]=='\\')
+      n->name[i]='/';
+  }
   __add_string_attribute("pathname", n->name, true);
   NODE_END();
   return buffer;

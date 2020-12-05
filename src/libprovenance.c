@@ -370,38 +370,35 @@ int fprovenance_propagate_file(int fd, bool propagate){
   return fprovenance_track_file(fd, propagate);
 }
 
-int provenance_label_file(const char path[PATH_MAX], const char *label){
+int provenance_taint_file(const char path[PATH_MAX], uint64_t taint){
   union prov_elt prov;
-  uint64_t taint = generate_label(label);
   int rc;
   rc = provenance_read_file(path, &prov);
   if(rc<0)
     return rc;
-  prov_bloom_add(prov_taint(&prov), taint);
+  provenance_taint_merge(prov_taint(&prov), taint);
   return __provenance_write_file(path, &prov);
 }
 
-int fprovenance_label_file(int fd, const char *label){
+int fprovenance_taint_file(int fd, uint64_t taint){
   union prov_elt prov;
-  uint64_t taint = generate_label(label);
   int rc;
   rc = fprovenance_read_file(fd, &prov);
   if(rc<0)
     return rc;
-  prov_bloom_add(prov_taint(&prov), taint);
+  provenance_taint_merge(prov_taint(&prov), taint);
   return __fprovenance_write_file(fd, &prov);
 }
 
-int provenance_label(const char *label){
+int provenance_taint(uint64_t taint){
   struct prov_process_config cfg;
-  uint64_t taint = generate_label(label);
   int rc;
   int fd = open(PROV_SELF_FILE, O_WRONLY);
   if( fd < 0 )
     return fd;
   memset(&cfg, 0, sizeof(struct prov_process_config));
   cfg.op=PROV_SET_TAINT;
-  prov_bloom_add(prov_taint(&(cfg.prov)), taint);
+  provenance_taint_merge(prov_taint(&(cfg.prov)), taint);
 
   rc = write(fd, &cfg, sizeof(struct prov_process_config));
   close(fd);
@@ -454,9 +451,8 @@ int provenance_propagate_process(uint32_t pid, bool propagate){
   return provenance_track_process(pid, propagate);
 }
 
-int provenance_label_process(uint32_t pid, const char *label){
+int provenance_taint_process(uint32_t pid, uint64_t taint){
   struct prov_process_config cfg;
-  uint64_t taint = generate_label(label);
   int rc;
   int fd = open(PROV_PROCESS_FILE, O_WRONLY);
   if( fd < 0 )
@@ -464,7 +460,7 @@ int provenance_label_process(uint32_t pid, const char *label){
   memset(&cfg, 0, sizeof(struct prov_process_config));
   cfg.vpid=pid;
   cfg.op=PROV_SET_TAINT;
-  prov_bloom_add(prov_taint(&(cfg.prov)), taint);
+  provenance_taint_merge(prov_taint(&(cfg.prov)), taint);
 
   rc = write(fd, &cfg, sizeof(struct prov_process_config));
   close(fd);
@@ -589,23 +585,29 @@ int provenance_secid_to_secctx( uint32_t secid, char* secctx, uint32_t len){
   int rc = 0;
   int fd;
 
+  // make sure empty string is returned on error
+  secctx[0]='\0';
+
   if( sec_find_entry(secid, secctx) )
     return 0;
   fd = open(PROV_SECCTX, O_RDONLY);
   if( fd < 0 )
-    return fd;
+    goto out;
   memset(&info, 0, sizeof(struct secinfo));
   info.secid=secid;
   rc = read(fd, &info, sizeof(struct secinfo));
   close(fd);
   if(rc<0){
-    secctx[0]='\0';
-    return rc;
+    goto out;
   }
   if(len<strlen(info.secctx))
     return -ENOMEM;
   strncpy(secctx, info.secctx, len);
   sec_add_entry(secid, secctx);
+out:
+  if(secctx[0]=='\0') {
+    utoa(secid, secctx, HEX);
+  }
   return rc;
 }
 
@@ -652,24 +654,28 @@ static inline int provenance_type_id_to_str(uint64_t id,
   int rc;
   int fd;
 
+  name[0]='\0';
+
   if( type_find_entry(id, name) )
     return 0;
   fd = open(PROV_TYPE, O_RDONLY);
   if( fd < 0 )
-    return fd;
+    goto out;
   memset(&info, 0, sizeof(struct prov_type));
   info.id=id;
   info.is_relation = is_relation;
   rc = read(fd, &info, sizeof(struct prov_type));
   close(fd);
-  if(rc<0){
-    name[0]='\0';
-    return rc;
-  }
+  if(rc<0)
+    goto out;
   if(len<strlen(info.str))
     return -ENOMEM;
   strncpy(name, info.str, len);
   type_add_entry(id, name);
+out:
+  if(name[0]=='\0') {
+      ulltoa(id, name, HEX);
+  }
   return rc;
 }
 
