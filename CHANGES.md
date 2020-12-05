@@ -2,7 +2,7 @@
 
 | Library version | Date       |
 | --------------- | ---------- |
-| 0.5.3           | N/A        |
+| 0.5.3           | 05/12/2020 |
 | 0.5.2           | 14/07/2020 |
 | 0.5.1           | 11/07/2020 |
 | 0.5.0           | 09/07/2020 |
@@ -54,6 +54,7 @@
 - Record packet length.
 - Change how taints are handled.
 - Remove duplicate option.
+- Support Fedora 33.
 ```
 
 ### v0.5.2
