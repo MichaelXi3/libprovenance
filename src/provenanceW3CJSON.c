@@ -641,7 +641,7 @@ char* sockaddr_to_json(char* buf, size_t blen, struct sockaddr_storage* addr, si
 char* sockaddr_to_label(char* buf, size_t blen, struct sockaddr_storage* addr, size_t length){
   char host[NI_MAXHOST];
   char serv[NI_MAXSERV];
-  int err;
+  int err = 0;
   struct sockaddr *ad = (struct sockaddr*)addr;
 
   if(ad->sa_family == AF_INET){
@@ -671,6 +671,7 @@ char* sockaddr_to_label(char* buf, size_t blen, struct sockaddr_storage* addr, s
 
 char* addr_to_json(struct address_struct* n){
   char addr_info[PATH_MAX+1024];
+  memset(addr_info, 0, PATH_MAX+1024);
   NODE_PREP_IDs(n);
   __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_json_attribute("cf:address", sockaddr_to_json(addr_info, PATH_MAX+1024, &n->addr, n->length), true);
