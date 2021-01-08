@@ -51,7 +51,7 @@
 
 ### v0.5.4
 ```
-- 
+- Fix initialization in W3C serialization library.
 ```
 
 ### v0.5.3

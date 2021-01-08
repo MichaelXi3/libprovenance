@@ -613,6 +613,7 @@ char* sockaddr_to_json(char* buf, size_t blen, struct sockaddr_storage* addr, si
   char serv[NI_MAXSERV];
   int err;
   struct sockaddr *ad = (struct sockaddr*)addr;
+  memset(buf, 0, PATH_MAX+1024);
 
   if(ad->sa_family == AF_INET){
     err = getnameinfo(ad, sizeof(struct sockaddr_in), host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
@@ -631,7 +632,7 @@ char* sockaddr_to_json(char* buf, size_t blen, struct sockaddr_storage* addr, si
   }else{
     err = getnameinfo(ad, length, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
     if (err < 0)
-      snprintf(buf, blen, "{\"type\":%d, \"host\":\"%s\", \"service\":\"%s\", \"error\":\"%s\"}", ad->sa_family, host, serv, gai_strerror(err));
+      snprintf(buf, blen, "{\"type\":%d, \"host\":\"%s\", \"service\":\"%s\", \"error\":\"%s\"}", ad->sa_family, "could not resolve", "could not resolve", gai_strerror(err));
     else
       snprintf(buf, blen, "{\"type\":%d, \"host\":\"%s\", \"service\":\"%s\"}", ad->sa_family, host, serv);
   }
@@ -671,7 +672,6 @@ char* sockaddr_to_label(char* buf, size_t blen, struct sockaddr_storage* addr, s
 
 char* addr_to_json(struct address_struct* n){
   char addr_info[PATH_MAX+1024];
-  memset(addr_info, 0, PATH_MAX+1024);
   NODE_PREP_IDs(n);
   __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
   __add_json_attribute("cf:address", sockaddr_to_json(addr_info, PATH_MAX+1024, &n->addr, n->length), true);
