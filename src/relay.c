@@ -141,13 +141,13 @@ static int open_files(const char* name)
     snprintf(tmp, PATH_MAX, "%s%d", path, i);
     relay_file[i] = open(tmp, O_RDONLY | O_NONBLOCK);
     if(relay_file[i]<0){
-      record_error("Could not open files (%d)\n", relay_file[i]);
+      record_error("Could not open files %s (%d)\n", tmp, relay_file[i]);
       return -1;
     }
     snprintf(tmp, PATH_MAX, "%s%d", PROV_LONG_RELAY_NAME, i);
     long_relay_file[i] = open(tmp, O_RDONLY | O_NONBLOCK);
     if(long_relay_file[i]<0){
-      record_error("Could not open files (%d)\n", long_relay_file[i]);
+      record_error("Could not open files %s (%d)\n", tmp, long_relay_file[i]);
       return -1;
     }
   }
