@@ -172,12 +172,6 @@ char* proc_to_spade_json(struct proc_prov_struct* n) {
   __add_uint32_attribute("uid", n->uid, true);
   __add_uint32_attribute("gid", n->gid, true);
   __add_uint32_attribute("tgid", n->tgid, true);
-  __add_uint32_attribute("utsns", n->utsns, true);
-  __add_uint32_attribute("ipcns", n->ipcns, true);
-  __add_uint32_attribute("mntns", n->mntns, true);
-  __add_uint32_attribute("pidns", n->pidns, true);
-  __add_uint32_attribute("netns", n->netns, true);
-  __add_uint32_attribute("cgroupns", n->cgroupns, true);
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   __add_string_attribute("secctx", secctx, true);
   NODE_END();
@@ -197,6 +191,12 @@ char* task_to_spade_json(struct task_prov_struct* n) {
   __add_uint64_attribute("rbytes", n->rbytes, true);
   __add_uint64_attribute("wbytes", n->wbytes, true);
   __add_uint64_attribute("cancel_wbytes", n->cancel_wbytes, true);
+  __add_uint32_attribute("utsns", n->utsns, true);
+  __add_uint32_attribute("ipcns", n->ipcns, true);
+  __add_uint32_attribute("mntns", n->mntns, true);
+  __add_uint32_attribute("pidns", n->pidns, true);
+  __add_uint32_attribute("netns", n->netns, true);
+  __add_uint32_attribute("cgroupns", n->cgroupns, true);
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   __add_string_attribute("secctx", secctx, true);
   NODE_END();

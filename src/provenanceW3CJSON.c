@@ -436,12 +436,6 @@ char* proc_to_json(struct proc_prov_struct* n){
   __add_uint32_attribute("cf:uid", n->uid, true);
   __add_uint32_attribute("cf:gid", n->gid, true);
   __add_uint32_attribute("cf:tgid", n->tgid, true);
-  __add_uint32_attribute("cf:utsns", n->utsns, true);
-  __add_uint32_attribute("cf:ipcns", n->ipcns, true);
-  __add_uint32_attribute("cf:mntns", n->mntns, true);
-  __add_uint32_attribute("cf:pidns", n->pidns, true);
-  __add_uint32_attribute("cf:netns", n->netns, true);
-  __add_uint32_attribute("cf:cgroupns", n->cgroupns, true);
   __add_string_attribute("cf:secctx", secctx, true);
   __add_label_attribute("process", utoa(n->identifier.node_id.version, tmp, DECIMAL), true);
   __close_json_entry(buffer);
@@ -465,6 +459,12 @@ char* task_to_json(struct task_prov_struct* n){
   __add_uint64_attribute("cf:rbytes", n->rbytes, true);
   __add_uint64_attribute("cf:wbytes", n->wbytes, true);
   __add_uint64_attribute("cf:cancel_wbytes", n->cancel_wbytes, true);
+  __add_uint32_attribute("cf:utsns", n->utsns, true);
+  __add_uint32_attribute("cf:ipcns", n->ipcns, true);
+  __add_uint32_attribute("cf:mntns", n->mntns, true);
+  __add_uint32_attribute("cf:pidns", n->pidns, true);
+  __add_uint32_attribute("cf:netns", n->netns, true);
+  __add_uint32_attribute("cf:cgroupns", n->cgroupns, true);
   __add_label_attribute("task", utoa(n->identifier.node_id.version, tmp, DECIMAL), true);
   __close_json_entry(buffer);
   return buffer;
