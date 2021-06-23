@@ -51,6 +51,7 @@
 
 ### v0.5.4
 ```
+- Namespaces associated with task.
 - Fix initialization in W3C serialization library.
 ```
 
