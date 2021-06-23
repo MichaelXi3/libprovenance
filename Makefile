@@ -1,11 +1,16 @@
 version=0.5.4
 BRANCH?=dev
 
-update_commit:
-	ruby ./scripts/commit.rb
+add_commit:
+	ruby ./scripts/add_commit.rb
 
-all: update_commit
+compile:
 	cd ./src && $(MAKE) all
+
+remove_commit:
+	ruby ./scripts/remove_commit.rb
+
+all: add_commit compile remove_commit
 
 clean:
 	cd ./threadpool && $(MAKE) clean
