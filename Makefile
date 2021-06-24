@@ -5,6 +5,7 @@ add_commit:
 	ruby ./scripts/add_commit.rb
 
 compile:
+	cd ./src && $(MAKE) clean
 	cd ./src && $(MAKE) all
 
 remove_commit:
