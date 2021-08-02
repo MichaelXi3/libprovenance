@@ -901,20 +901,6 @@ int provenance_lib_commit(char* commit, size_t len){
   return 0;
 }
 
-int provenance_create_channel(const char name[PATH_MAX]){
-  int rc;
-  char buffer[PATH_MAX];
-
-  if(strlen(name) > PATH_MAX)
-    return -ENOMEM;
-  int fd = open(PROV_CHANNEL, O_WRONLY);
-  if( fd < 0 )
-    return fd;
-  rc = write(fd, name, strlen(name)+1);
-  close(fd);
-  return rc;
-}
-
 struct disc_entry {
     uint64_t id;            /* we'll use this field as the key */
     struct disc_node_struct prov;

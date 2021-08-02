@@ -92,7 +92,7 @@ bool provenance_was_written(void);
 * start and register callback. Note that there is no concurrency guarantee made.
 * The application developper is expected to deal with concurrency issue.
 */
-int provenance_relay_register(struct provenance_ops* ops, const char* name);
+int provenance_relay_register(struct provenance_ops* ops);
 
 /*
 * shutdown tightly the things that are running behind the scene.
@@ -407,10 +407,6 @@ int provenance_lib_version(char* version, size_t len);
 int provenance_commit(char* commit, size_t len);
 
 int provenance_lib_commit(char* commit, size_t len);
-
-int provenance_create_channel(const char name[PATH_MAX]);
-
-
 
 /* HIGH LEVEL DISCLOSING API */
 typedef uint64_t agent_t;
