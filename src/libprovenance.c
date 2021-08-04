@@ -901,6 +901,17 @@ int provenance_lib_commit(char* commit, size_t len){
   return 0;
 }
 
+int provenance_dropped(struct dropped *drop){
+  int rc;
+  int fd = open(PROV_DROPPED_FILE, O_RDONLY);
+  if( fd < 0 )
+    return fd;
+  memset(drop, 0, sizeof(struct dropped));
+  rc = read(fd, drop, sizeof(struct dropped));
+  close(fd);
+  return rc;
+}
+
 struct disc_entry {
     uint64_t id;            /* we'll use this field as the key */
     struct disc_node_struct prov;

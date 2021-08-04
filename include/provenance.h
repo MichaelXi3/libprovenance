@@ -261,6 +261,11 @@ int provenance_flush(void);
 int provenance_change_epoch(void);
 
 /*
+ * retrieve information about the number of graph elements dropped.
+ */
+int provenance_dropped(struct dropped *drop);
+
+/*
 * @name file name
 * @inode_info point to an inode_info structure
 * retrieve provenance information of the file associated with name.

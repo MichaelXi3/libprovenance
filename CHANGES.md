@@ -51,6 +51,7 @@
 
 ### v0.5.4
 ```
+- Add function to retrieve number of graph elements dropped.
 - Switch back to single relay channel support.
 - Namespaces associated with task.
 - Fix initialization in W3C serialization library.
