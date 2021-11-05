@@ -270,9 +270,9 @@ int provenance_dropped(struct dropped *drop);
 * @inode_info point to an inode_info structure
 * retrieve provenance information of the file associated with name.
 */
-int provenance_read_file(const char path[PATH_MAX], union prov_elt* inode_info);
+int provenance_read_file(const char *path, union prov_elt* inode_info);
 
-int provenance_file_id(const char path[PATH_MAX], char* buff, size_t len);
+int provenance_file_id(const char *path, char* buff, size_t len);
 
 int fprovenance_read_file(int fd, union prov_elt* inode_info);
 
@@ -283,7 +283,7 @@ int fprovenance_file_id(int fd, char* buff, size_t len);
 * @track boolean either to track or not the file
 * set tracking option corresponding to the file associated with name
 */
-int provenance_track_file(const char name[PATH_MAX], bool track);
+int provenance_track_file(const char *path, bool track);
 
 /*
 * @fd file descriptor
@@ -297,7 +297,7 @@ int fprovenance_track_file(int fd, bool track);
 * @opaque boolean either to make opaque or not the file
 * make the file opaque to provenance tracking.
 */
-int provenance_opaque_file(const char name[PATH_MAX], bool opaque);
+int provenance_opaque_file(const char *path, bool opaque);
 
 /*
 * @fd file descriptor
@@ -311,7 +311,7 @@ int fprovenance_opaque_file(int fd, bool opaque);
 * @propagate boolean either to propagate tracking or not
 * set propagate option corresponding to the file associated with name
 */
-int provenance_propagate_file(const char name[PATH_MAX], bool propagate);
+int provenance_propagate_file(const char *path, bool propagate);
 
 /*
 * @fd file descriptor
@@ -325,7 +325,7 @@ int fprovenance_propagate_file(int fd, bool propagate);
 * @taint taint to be applied to the file
 * add taint to the file corresponding to name
 */
-int provenance_taint_file(const char name[PATH_MAX], uint64_t taint);
+int provenance_taint_file(const char *path, uint64_t taint);
 
 /*
 * @fd file descriptor
@@ -432,6 +432,6 @@ void disclose_informs(activity_t from, activity_t to);
 void disclose_influences(uint64_t activity_t, uint64_t agent_t);
 void disclose_associates(uint64_t agent_t, uint64_t activity_t);
 
-entity_t disclose_get_file(const char path[PATH_MAX]);
+entity_t disclose_get_file(const char *path);
 
 #endif /* __PROVENANCELIB_H */

@@ -260,11 +260,11 @@ int provenance_change_epoch(void){
   return rc;
 }
 
-int provenance_read_file(const char path[PATH_MAX], union prov_elt* inode_info){
+int provenance_read_file(const char *path, union prov_elt* inode_info){
   return getxattr(path, XATTR_NAME_PROVENANCE, inode_info, sizeof(union prov_elt));
 }
 
-int provenance_file_id(const char path[PATH_MAX], char* buff, size_t len){
+int provenance_file_id(const char *path, char* buff, size_t len){
   int rc;
   union prov_elt inode_info;
   char id[PROV_ID_STR_LEN];
@@ -304,7 +304,7 @@ int fprovenance_file_id(int fd, char* buff, size_t len){
   return 0;
 }
 
-static inline int __provenance_write_file(const char path[PATH_MAX], union prov_elt* inode_info){
+static inline int __provenance_write_file(const char *path, union prov_elt* inode_info){
   return setxattr(path, XATTR_NAME_PROVENANCE, inode_info, sizeof(union prov_elt), 0);
 }
 
@@ -312,7 +312,7 @@ static inline int __fprovenance_write_file(int fd, union prov_elt* inode_info){
   return fsetxattr(fd, XATTR_NAME_PROVENANCE, inode_info, sizeof(union prov_elt), 0);
 }
 
-static inline int __provenance_set_flags_file(const char path[PATH_MAX], uint8_t bit, bool v){
+static inline int __provenance_set_flags_file(const char *path, uint8_t bit, bool v){
   union prov_elt prov;
   int rc;
   rc = provenance_read_file(path, &prov);
@@ -338,8 +338,8 @@ static inline int __fprovenance_set_flags_file(int fd, uint8_t bit, bool v){
   return __fprovenance_write_file(fd, &prov);
 }
 
-#define declare_set_file_fcn(fcn_name, element) int fcn_name (const char name[PATH_MAX], bool v){\
-    return __provenance_set_flags_file(name, element, v);\
+#define declare_set_file_fcn(fcn_name, element) int fcn_name (const char *path, bool v){\
+    return __provenance_set_flags_file(path, element, v);\
   }
 
 #define declare_fset_file_fcn(fcn_name, element) int fcn_name (int fd, bool v){\
@@ -354,12 +354,12 @@ declare_fset_file_fcn(fprovenance_track_file, TRACKED_BIT);
 declare_fset_file_fcn(fprovenance_opaque_file, OPAQUE_BIT);
 declare_fset_file_fcn(__fprovenance_propagate_file, PROPAGATE_BIT);
 
-int provenance_propagate_file(const char name[PATH_MAX], bool propagate){
+int provenance_propagate_file(const char *path, bool propagate){
   int err;
-  err = __provenance_propagate_file(name, propagate);
+  err = __provenance_propagate_file(path, propagate);
   if(err < 0)
     return err;
-  return provenance_track_file(name, propagate);
+  return provenance_track_file(path, propagate);
 }
 
 int fprovenance_propagate_file(int fd, bool propagate){
@@ -370,7 +370,7 @@ int fprovenance_propagate_file(int fd, bool propagate){
   return fprovenance_track_file(fd, propagate);
 }
 
-int provenance_taint_file(const char path[PATH_MAX], uint64_t taint){
+int provenance_taint_file(const char *path, uint64_t taint){
   union prov_elt prov;
   int rc;
   rc = provenance_read_file(path, &prov);
@@ -1023,7 +1023,7 @@ void disclose_associates(uint64_t from, uint64_t to) {
   __disclose_relation(RL_ASSOCIATED_DISC, from, to);
 }
 
-entity_t disclose_get_file(const char path[PATH_MAX]) {
+entity_t disclose_get_file(const char *path) {
   struct disc_entry *de = calloc(1, sizeof(struct disc_entry));
   uint64_t rc = 0;
 
