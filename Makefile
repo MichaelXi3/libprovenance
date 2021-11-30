@@ -1,11 +1,17 @@
-version=0.5.3
+version=0.5.4
 BRANCH?=dev
 
-update_commit:
-	ruby ./scripts/commit.rb
+add_commit:
+	ruby ./scripts/add_commit.rb
 
-all: update_commit
+compile:
+	cd ./src && $(MAKE) clean
 	cd ./src && $(MAKE) all
+
+remove_commit:
+	ruby ./scripts/remove_commit.rb
+
+all: add_commit compile remove_commit
 
 clean:
 	cd ./threadpool && $(MAKE) clean
@@ -58,7 +64,7 @@ travis_update_files: travis_checkout_dev
 travis: travis_update_files prepare all install
 
 publish_rpm:
-	cd ./output && package_cloud push camflow/provenance/fedora/33 libprovenance-$(version)-1.x86_64.rpm
+	cd ./output && package_cloud push camflow/provenance/fedora/35 libprovenance-$(version)-1.x86_64.rpm
 
 publish_deb:
 	cd ./output && package_cloud push camflow/provenance/ubuntu/bionic libprovenance_$(version)-2_amd64.deb

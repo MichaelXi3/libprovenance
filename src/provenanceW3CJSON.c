@@ -436,12 +436,6 @@ char* proc_to_json(struct proc_prov_struct* n){
   __add_uint32_attribute("cf:uid", n->uid, true);
   __add_uint32_attribute("cf:gid", n->gid, true);
   __add_uint32_attribute("cf:tgid", n->tgid, true);
-  __add_uint32_attribute("cf:utsns", n->utsns, true);
-  __add_uint32_attribute("cf:ipcns", n->ipcns, true);
-  __add_uint32_attribute("cf:mntns", n->mntns, true);
-  __add_uint32_attribute("cf:pidns", n->pidns, true);
-  __add_uint32_attribute("cf:netns", n->netns, true);
-  __add_uint32_attribute("cf:cgroupns", n->cgroupns, true);
   __add_string_attribute("cf:secctx", secctx, true);
   __add_label_attribute("process", utoa(n->identifier.node_id.version, tmp, DECIMAL), true);
   __close_json_entry(buffer);
@@ -465,6 +459,12 @@ char* task_to_json(struct task_prov_struct* n){
   __add_uint64_attribute("cf:rbytes", n->rbytes, true);
   __add_uint64_attribute("cf:wbytes", n->wbytes, true);
   __add_uint64_attribute("cf:cancel_wbytes", n->cancel_wbytes, true);
+  __add_uint32_attribute("cf:utsns", n->utsns, true);
+  __add_uint32_attribute("cf:ipcns", n->ipcns, true);
+  __add_uint32_attribute("cf:mntns", n->mntns, true);
+  __add_uint32_attribute("cf:pidns", n->pidns, true);
+  __add_uint32_attribute("cf:netns", n->netns, true);
+  __add_uint32_attribute("cf:cgroupns", n->cgroupns, true);
   __add_label_attribute("task", utoa(n->identifier.node_id.version, tmp, DECIMAL), true);
   __close_json_entry(buffer);
   return buffer;
@@ -613,6 +613,7 @@ char* sockaddr_to_json(char* buf, size_t blen, struct sockaddr_storage* addr, si
   char serv[NI_MAXSERV];
   int err;
   struct sockaddr *ad = (struct sockaddr*)addr;
+  memset(buf, 0, PATH_MAX+1024);
 
   if(ad->sa_family == AF_INET){
     err = getnameinfo(ad, sizeof(struct sockaddr_in), host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
@@ -631,7 +632,7 @@ char* sockaddr_to_json(char* buf, size_t blen, struct sockaddr_storage* addr, si
   }else{
     err = getnameinfo(ad, length, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
     if (err < 0)
-      snprintf(buf, blen, "{\"type\":%d, \"host\":\"%s\", \"service\":\"%s\", \"error\":\"%s\"}", ad->sa_family, host, serv, gai_strerror(err));
+      snprintf(buf, blen, "{\"type\":%d, \"host\":\"%s\", \"service\":\"%s\", \"error\":\"%s\"}", ad->sa_family, "could not resolve", "could not resolve", gai_strerror(err));
     else
       snprintf(buf, blen, "{\"type\":%d, \"host\":\"%s\", \"service\":\"%s\"}", ad->sa_family, host, serv);
   }
@@ -641,7 +642,7 @@ char* sockaddr_to_json(char* buf, size_t blen, struct sockaddr_storage* addr, si
 char* sockaddr_to_label(char* buf, size_t blen, struct sockaddr_storage* addr, size_t length){
   char host[NI_MAXHOST];
   char serv[NI_MAXSERV];
-  int err;
+  int err = 0;
   struct sockaddr *ad = (struct sockaddr*)addr;
 
   if(ad->sa_family == AF_INET){

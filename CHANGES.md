@@ -2,6 +2,7 @@
 
 | Library version | Date       |
 | --------------- | ---------- |
+| 0.5.4           | 29/11/2021 |
 | 0.5.3           | 05/12/2020 |
 | 0.5.2           | 14/07/2020 |
 | 0.5.1           | 11/07/2020 |
@@ -47,6 +48,15 @@
 | 0.1.2           | 26/05/2016 |
 | 0.1.1           | 03/04/2016 |
 | 0.1.0           | 28/03/2016 |
+
+### v0.5.4
+```
+- Add function to retrieve number of graph elements dropped.
+- Switch back to single relay channel support.
+- Namespaces associated with task.
+- Fix initialization in W3C serialization library.
+- Support Fedora 35.
+```
 
 ### v0.5.3
 ```

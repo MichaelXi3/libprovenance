@@ -29,12 +29,12 @@
 
 #define PROVLIB_VERSION_MAJOR 0
 #define PROVLIB_VERSION_MINOR 5
-#define PROVLIB_VERSION_PATCH 3
+#define PROVLIB_VERSION_PATCH 4
 #define PROVLIB_VERSION_STR   "v"xstr(PROVLIB_VERSION_MAJOR)\
     "."xstr(PROVLIB_VERSION_MINOR)\
     "."xstr(PROVLIB_VERSION_PATCH)\
 
-#define PROVLIB_COMMIT "1f844c3fdff94456cedc17e1850cb31b3196408f"
+#define PROVLIB_COMMIT ""
 
 struct provenance_ops{
   void (*init)(void);
@@ -92,7 +92,7 @@ bool provenance_was_written(void);
 * start and register callback. Note that there is no concurrency guarantee made.
 * The application developper is expected to deal with concurrency issue.
 */
-int provenance_relay_register(struct provenance_ops* ops, const char* name);
+int provenance_relay_register(struct provenance_ops* ops);
 
 /*
 * shutdown tightly the things that are running behind the scene.
@@ -261,13 +261,18 @@ int provenance_flush(void);
 int provenance_change_epoch(void);
 
 /*
+ * retrieve information about the number of graph elements dropped.
+ */
+int provenance_dropped(struct dropped *drop);
+
+/*
 * @name file name
 * @inode_info point to an inode_info structure
 * retrieve provenance information of the file associated with name.
 */
-int provenance_read_file(const char path[PATH_MAX], union prov_elt* inode_info);
+int provenance_read_file(const char *path, union prov_elt* inode_info);
 
-int provenance_file_id(const char path[PATH_MAX], char* buff, size_t len);
+int provenance_file_id(const char *path, char* buff, size_t len);
 
 int fprovenance_read_file(int fd, union prov_elt* inode_info);
 
@@ -278,7 +283,7 @@ int fprovenance_file_id(int fd, char* buff, size_t len);
 * @track boolean either to track or not the file
 * set tracking option corresponding to the file associated with name
 */
-int provenance_track_file(const char name[PATH_MAX], bool track);
+int provenance_track_file(const char *path, bool track);
 
 /*
 * @fd file descriptor
@@ -292,7 +297,7 @@ int fprovenance_track_file(int fd, bool track);
 * @opaque boolean either to make opaque or not the file
 * make the file opaque to provenance tracking.
 */
-int provenance_opaque_file(const char name[PATH_MAX], bool opaque);
+int provenance_opaque_file(const char *path, bool opaque);
 
 /*
 * @fd file descriptor
@@ -306,7 +311,7 @@ int fprovenance_opaque_file(int fd, bool opaque);
 * @propagate boolean either to propagate tracking or not
 * set propagate option corresponding to the file associated with name
 */
-int provenance_propagate_file(const char name[PATH_MAX], bool propagate);
+int provenance_propagate_file(const char *path, bool propagate);
 
 /*
 * @fd file descriptor
@@ -320,7 +325,7 @@ int fprovenance_propagate_file(int fd, bool propagate);
 * @taint taint to be applied to the file
 * add taint to the file corresponding to name
 */
-int provenance_taint_file(const char name[PATH_MAX], uint64_t taint);
+int provenance_taint_file(const char *path, uint64_t taint);
 
 /*
 * @fd file descriptor
@@ -408,10 +413,6 @@ int provenance_commit(char* commit, size_t len);
 
 int provenance_lib_commit(char* commit, size_t len);
 
-int provenance_create_channel(const char name[PATH_MAX]);
-
-
-
 /* HIGH LEVEL DISCLOSING API */
 typedef uint64_t agent_t;
 typedef uint64_t activity_t;
@@ -431,6 +432,6 @@ void disclose_informs(activity_t from, activity_t to);
 void disclose_influences(uint64_t activity_t, uint64_t agent_t);
 void disclose_associates(uint64_t agent_t, uint64_t activity_t);
 
-entity_t disclose_get_file(const char path[PATH_MAX]);
+entity_t disclose_get_file(const char *path);
 
 #endif /* __PROVENANCELIB_H */

@@ -43,7 +43,7 @@ static threadpool worker_thpool=NULL;
 static uint8_t running = 1;
 
 /* internal functions */
-static int open_files(const char *name);
+static int open_files(void);
 static int close_files(void);
 static int create_worker_pool(void);
 static void destroy_worker_pool(void);
@@ -75,7 +75,7 @@ int provenance_record_pid( void ){
   return err;
 }
 
-int provenance_relay_register(struct provenance_ops* ops, const char* name)
+int provenance_relay_register(struct provenance_ops* ops)
 {
   int err;
 
@@ -92,12 +92,8 @@ int provenance_relay_register(struct provenance_ops* ops, const char* name)
   if(ncpus>NUMBER_CPUS)
     return -1;
 
-  /* create channel */
-  if(name != NULL)
-    provenance_create_channel(name);
-
   /* open relay files */
-  if(open_files(name))
+  if(open_files())
     return -1;
 
   /* create callback threads */
@@ -119,35 +115,28 @@ void provenance_relay_stop()
   destroy_worker_pool();
 }
 
-static int open_files(const char* name)
+static int open_files(void)
 {
   int i;
   char tmp[PATH_MAX]; // to store file name
   char *path;
   char *long_path;
 
-  if(name == NULL){
-    path = PROV_RELAY_NAME;
-    long_path = PROV_LONG_RELAY_NAME;
-  }else{
-    path = malloc(PATH_MAX);
-    snprintf(path, PATH_MAX, "%s%s", PROV_CHANNEL_ROOT, name);
-    long_path = malloc(PATH_MAX);
-    snprintf(long_path, PATH_MAX, "%slong_%s", PROV_CHANNEL_ROOT, name);
-  }
+  path = PROV_RELAY_NAME;
+  long_path = PROV_LONG_RELAY_NAME;
 
   tmp[0]='\0';
   for(i=0; i<ncpus; i++){
     snprintf(tmp, PATH_MAX, "%s%d", path, i);
     relay_file[i] = open(tmp, O_RDONLY | O_NONBLOCK);
     if(relay_file[i]<0){
-      record_error("Could not open files (%d)\n", relay_file[i]);
+      record_error("Could not open files %s (%d)\n", tmp, relay_file[i]);
       return -1;
     }
     snprintf(tmp, PATH_MAX, "%s%d", PROV_LONG_RELAY_NAME, i);
     long_relay_file[i] = open(tmp, O_RDONLY | O_NONBLOCK);
     if(long_relay_file[i]<0){
-      record_error("Could not open files (%d)\n", long_relay_file[i]);
+      record_error("Could not open files %s (%d)\n", tmp, long_relay_file[i]);
       return -1;
     }
   }
@@ -265,8 +254,7 @@ void node_record(union prov_elt *msg){
   }
 }
 
-void prov_record(union prov_elt* msg){
-
+void prov_record(union prov_elt* msg) {
   if(prov_is_relation(msg))
     relation_record(msg);
   else
