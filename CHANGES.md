@@ -52,6 +52,7 @@
 
 ### v0.5.5
 ```
+- Add mechanism to set relay buffer size through configuration.
 ```
 
 ### v0.5.4

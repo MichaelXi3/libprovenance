@@ -134,19 +134,6 @@ int provenance_set_propagate(bool v){
   return provenance_set_tracked(v);
 }
 
-int provenance_set_machine_id(uint32_t v){
-  int rc;
-  int fd = open(PROV_MACHINE_ID_FILE, O_WRONLY);
-
-  if(fd<0)
-    return fd;
-  rc = write(fd, &v, sizeof(uint32_t));
-  close(fd);
-  if(rc<0)
-    return rc;
-  return 0;
-}
-
 int provenance_get_machine_id(uint32_t* v){
   int rc;
   int fd = open(PROV_MACHINE_ID_FILE, O_RDONLY);
@@ -154,19 +141,6 @@ int provenance_get_machine_id(uint32_t* v){
   if(fd<0)
     return fd;
   rc = read(fd, v, sizeof(uint32_t));
-  close(fd);
-  if(rc<0)
-    return rc;
-  return 0;
-}
-
-int provenance_set_boot_id(uint32_t v){
-  int rc;
-  int fd = open(PROV_BOOT_ID_FILE, O_WRONLY);
-
-  if(fd<0)
-    return fd;
-  rc = write(fd, &v, sizeof(uint32_t));
   close(fd);
   if(rc<0)
     return rc;
@@ -908,6 +882,25 @@ int provenance_dropped(struct dropped *drop){
     return fd;
   memset(drop, 0, sizeof(struct dropped));
   rc = read(fd, drop, sizeof(struct dropped));
+  close(fd);
+  return rc;
+}
+
+int provenance_relay_start(uint32_t boot_id,
+                            uint32_t machine_id,
+                            uint32_t buff_exp,
+                            uint32_t subuf_nb) {
+  int rc;
+  struct relay_conf conf;
+  int fd = open(PROV_RELAY_CONF_FILE, O_WRONLY);
+  if( fd < 0 )
+    return fd;
+
+  conf.boot_id = boot_id;
+  conf.machine_id = machine_id;
+  conf.buff_exp = buff_exp;
+  conf.subuf_nb = subuf_nb;
+  rc = write(fd, &conf, sizeof(struct relay_conf));
   close(fd);
   return rc;
 }

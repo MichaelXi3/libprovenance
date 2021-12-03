@@ -94,6 +94,12 @@ bool provenance_was_written(void);
 */
 int provenance_relay_register(struct provenance_ops* ops);
 
+/* stat the relay */
+int provenance_relay_start(uint32_t prov_boot_id,
+                            uint32_t machine_id,
+                            uint32_t buff_exp,
+                            uint32_t subuf_nb);
+
 /*
 * shutdown tightly the things that are running behind the scene.
 */
@@ -201,24 +207,10 @@ bool provenance_get_propagate(void);
 int provenance_taint(uint64_t taint);
 
 /*
-* @v uint32_t value
-* Assign an ID to the current machine. Will fail if the current process is not
-* root.
-*/
-int provenance_set_machine_id(uint32_t v);
-
-/*
 * @v pointer to uint32_t value
 * Read the machine ID corresponding to the current machine.
 */
 int provenance_get_machine_id(uint32_t* v);
-
-/*
-* @v uint32_t value
-* Assign an ID to the current boot. Will fail if the current process is not
-* root.
-*/
-int provenance_set_boot_id(uint32_t v);
 
 /*
 * @v pointer to uint32_t value
