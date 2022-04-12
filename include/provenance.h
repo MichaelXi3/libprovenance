@@ -422,8 +422,8 @@ void disclose_derives(entity_t from, entity_t to);
 void disclose_generates(activity_t from, entity_t to);
 void disclose_uses(entity_t from, activity_t to);
 void disclose_informs(activity_t from, activity_t to);
-void disclose_influences(uint64_t activity_t, uint64_t agent_t);
-void disclose_associates(uint64_t agent_t, uint64_t activity_t);
+void disclose_influences(activity_t ac, agent_t ag);
+void disclose_associates(agent_t ag, activity_t ac);
 
 entity_t disclose_get_file(const char *path);
 
