@@ -83,6 +83,9 @@ declare_get_boolean_fcn(provenance_get_all, PROV_ALL_FILE);
 
 declare_get_boolean_fcn(provenance_was_written, PROV_WRITTEN_FILE);
 
+declare_set_boolean_fcn(provenance_should_version, PROV_SHOULD_VERSION_FILE);
+declare_get_boolean_fcn(provenance_does_version, PROV_SHOULD_VERSION_FILE);
+
 declare_set_boolean_fcn(provenance_should_compress_node, PROV_COMPRESS_NODE_FILE);
 declare_get_boolean_fcn(provenance_does_compress_node, PROV_COMPRESS_NODE_FILE);
 

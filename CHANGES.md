@@ -52,6 +52,7 @@
 
 ### v0.5.5
 ```
+- Allow to turn versioning on/off.
 - Add mechanism to set relay buffer size through configuration.
 ```
 

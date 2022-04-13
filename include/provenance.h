@@ -133,6 +133,18 @@ int provenance_set_all(bool v);
 */
 bool provenance_get_all(void);
 
+
+/*
+* @v boolean value
+* if true have version, if false no version
+*/
+int provenance_should_version(bool v);
+
+/*
+* return either or not nodes versions are enable.
+*/
+bool provenance_does_version(void);
+
 /*
 * @v boolean value
 * activate provenance node compression.
