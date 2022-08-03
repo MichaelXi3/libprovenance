@@ -406,6 +406,8 @@ int provenance_policy_hash(uint8_t* buffer, size_t length);
 
 char* relation_id_to_str(uint64_t id);
 char* node_id_to_str(uint64_t id);
+char* name_id_to_str(union prov_identifier* name_id);
+int nash_init(void);
 
 uint64_t relation_str_to_id(const char* name, uint32_t len);
 uint64_t node_str_to_id(const char* name, uint32_t len);

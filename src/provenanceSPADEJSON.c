@@ -91,6 +91,7 @@ static inline void __init_relation(char* type,
 
 #define NODE_START(type) ID_ENCODE(n->identifier.buffer, PROV_IDENTIFIER_BUFFER_LENGTH, id, PROV_ID_STR_LEN);\
                     __init_node(type, id, &(n->identifier.node_id));\
+                    __add_name_id(&(n->name_id), true);\
                     __add_uint64hex_attribute("cf:taint", n->taint, true);\
                     __add_uint64_attribute("cf:jiffies", n->jiffies, true);\
                     __add_uint32_attribute("cf:epoch", n->epoch, true);

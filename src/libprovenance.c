@@ -607,7 +607,7 @@ bool type_exists_entry(uint64_t typeid) {
 
 static void type_add_entry(uint64_t typeid, const char* name){
   struct typeentry *te;
-  if( sec_exists_entry(typeid) )
+  if( type_exists_entry(typeid) )
     return;
   te = malloc(sizeof(struct typeentry));
   te->id=typeid;

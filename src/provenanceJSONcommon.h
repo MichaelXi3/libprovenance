@@ -144,3 +144,13 @@ static inline void __add_machine_id(uint32_t value, bool comma){
   strncat(buffer, utoa(value, tmp, DECIMAL), BUFFER_LENGTH);
   strncat(buffer, "\"", BUFFER_LENGTH);
 }
+
+
+static inline void __add_name_id(union prov_identifier* name_id, bool comma){
+  char *name;
+  if (name_id->node_id.type == 0)
+    return;
+  name = name_id_to_str(name_id);
+  if (name != NULL)
+    __add_string_attribute("cf:name", name, comma);
+}
