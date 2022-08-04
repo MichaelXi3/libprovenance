@@ -434,6 +434,7 @@ char* proc_to_json(struct proc_prov_struct* n){
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   NODE_PREP_IDs(n);
   __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
+  __add_name_id(&(n->name_id), true);
   __add_uint32_attribute("cf:uid", n->uid, true);
   __add_uint32_attribute("cf:gid", n->gid, true);
   __add_uint32_attribute("cf:tgid", n->tgid, true);
@@ -487,6 +488,7 @@ char* inode_to_json(struct inode_prov_struct* n){
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   NODE_PREP_IDs(n);
   __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
+  __add_name_id(&(n->name_id), true);
   __add_uint32_attribute("cf:uid", n->uid, true);
   __add_uint32_attribute("cf:gid", n->gid, true);
   __add_uint32hex_attribute("cf:mode", n->mode, true);

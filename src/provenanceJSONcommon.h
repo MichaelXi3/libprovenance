@@ -145,7 +145,6 @@ static inline void __add_machine_id(uint32_t value, bool comma){
   strncat(buffer, "\"", BUFFER_LENGTH);
 }
 
-
 static inline void __add_name_id(union prov_identifier* name_id, bool comma){
   char *name;
   if (name_id->node_id.type == 0)
