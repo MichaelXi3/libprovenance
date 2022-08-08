@@ -450,6 +450,7 @@ char* task_to_json(struct task_prov_struct* n){
   provenance_secid_to_secctx(n->secid, secctx, PATH_MAX);
   NODE_PREP_IDs(n);
   __node_start(id, &(n->identifier.node_id), n->taint, n->jiffies, n->epoch);
+  __add_name_id(&(n->name_id), true);
   __add_uint32_attribute("cf:pid", n->pid, true);
   __add_uint32_attribute("cf:vpid", n->vpid, true);
   __add_uint64_attribute("cf:utime", n->utime, true);
