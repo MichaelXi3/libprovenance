@@ -13,6 +13,9 @@
  * published by the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
  */
+
+#include <unistd.h>
+
 #define MAX_JSON_BUFFER_EXP     13
 #define MAX_JSON_BUFFER_LENGTH  ((1 << MAX_JSON_BUFFER_EXP)*sizeof(uint8_t))
 #define BUFFER_LENGTH (MAX_JSON_BUFFER_LENGTH-strnlen(buffer, MAX_JSON_BUFFER_LENGTH))
@@ -147,9 +150,15 @@ static inline void __add_machine_id(uint32_t value, bool comma){
 
 static inline void __add_name_id(union prov_identifier* name_id, bool comma){
   char *name;
+  int i;
   if (name_id->node_id.type == 0)
     return;
-  name = name_id_to_str(name_id);
+  for (i = 0; i < 5; i++) {
+    name = name_id_to_str(name_id);
+    if (name != NULL)
+      break;
+    usleep(50000);
+  }
   if (name != NULL)
     __add_string_attribute("cf:name", name, comma);
 }
