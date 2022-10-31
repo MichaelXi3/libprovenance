@@ -1,17 +1,18 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
-*
-* Author: Thomas Pasquier <thomas.pasquier@bristol.ac.uk>
-*
-* Copyright (C) 2015-2016 University of Cambridge
-* Copyright (C) 2016-2017 Harvard University
-* Copyright (C) 2017-2018 University of Cambridge
-* Copyright (C) 2018-202O University of Bristol
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License version 2, as
-* published by the Free Software Foundation.
-*
-*/
+ * Copyright (C) 2015-2016 University of Cambridge,
+ * Copyright (C) 2016-2017 Harvard University,
+ * Copyright (C) 2017-2018 University of Cambridge,
+ * Copyright (C) 2018-2021 University of Bristol,
+ * Copyright (C) 2021-2022 University of British Columbia
+ *
+ * Author: Thomas Pasquier <tfjmp@cs.ubc.ca>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2, as
+ * published by the Free Software Foundation; either version 2 of the License,
+ * or (at your option) any later version.
+ */
 #include <sys/types.h>
 #include <sys/syscall.h>
 #include <pthread.h>
@@ -82,6 +83,9 @@ declare_get_boolean_fcn(provenance_get_all, PROV_ALL_FILE);
 
 declare_get_boolean_fcn(provenance_was_written, PROV_WRITTEN_FILE);
 
+declare_set_boolean_fcn(provenance_should_version, PROV_SHOULD_VERSION_FILE);
+declare_get_boolean_fcn(provenance_does_version, PROV_SHOULD_VERSION_FILE);
+
 declare_set_boolean_fcn(provenance_should_compress_node, PROV_COMPRESS_NODE_FILE);
 declare_get_boolean_fcn(provenance_does_compress_node, PROV_COMPRESS_NODE_FILE);
 
@@ -134,19 +138,6 @@ int provenance_set_propagate(bool v){
   return provenance_set_tracked(v);
 }
 
-int provenance_set_machine_id(uint32_t v){
-  int rc;
-  int fd = open(PROV_MACHINE_ID_FILE, O_WRONLY);
-
-  if(fd<0)
-    return fd;
-  rc = write(fd, &v, sizeof(uint32_t));
-  close(fd);
-  if(rc<0)
-    return rc;
-  return 0;
-}
-
 int provenance_get_machine_id(uint32_t* v){
   int rc;
   int fd = open(PROV_MACHINE_ID_FILE, O_RDONLY);
@@ -154,19 +145,6 @@ int provenance_get_machine_id(uint32_t* v){
   if(fd<0)
     return fd;
   rc = read(fd, v, sizeof(uint32_t));
-  close(fd);
-  if(rc<0)
-    return rc;
-  return 0;
-}
-
-int provenance_set_boot_id(uint32_t v){
-  int rc;
-  int fd = open(PROV_BOOT_ID_FILE, O_WRONLY);
-
-  if(fd<0)
-    return fd;
-  rc = write(fd, &v, sizeof(uint32_t));
   close(fd);
   if(rc<0)
     return rc;
@@ -629,7 +607,7 @@ bool type_exists_entry(uint64_t typeid) {
 
 static void type_add_entry(uint64_t typeid, const char* name){
   struct typeentry *te;
-  if( sec_exists_entry(typeid) )
+  if( type_exists_entry(typeid) )
     return;
   te = malloc(sizeof(struct typeentry));
   te->id=typeid;
@@ -908,6 +886,25 @@ int provenance_dropped(struct dropped *drop){
     return fd;
   memset(drop, 0, sizeof(struct dropped));
   rc = read(fd, drop, sizeof(struct dropped));
+  close(fd);
+  return rc;
+}
+
+int provenance_relay_start(uint32_t boot_id,
+                            uint32_t machine_id,
+                            uint32_t buff_exp,
+                            uint32_t subuf_nb) {
+  int rc;
+  struct relay_conf conf;
+  int fd = open(PROV_RELAY_CONF_FILE, O_WRONLY);
+  if( fd < 0 )
+    return fd;
+
+  conf.boot_id = boot_id;
+  conf.machine_id = machine_id;
+  conf.buff_exp = buff_exp;
+  conf.subuf_nb = subuf_nb;
+  rc = write(fd, &conf, sizeof(struct relay_conf));
   close(fd);
   return rc;
 }

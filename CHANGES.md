@@ -2,6 +2,7 @@
 
 | Library version | Date       |
 | --------------- | ---------- |
+| 0.5.5           | 30/10/2022 |
 | 0.5.4           | 29/11/2021 |
 | 0.5.3           | 05/12/2020 |
 | 0.5.2           | 14/07/2020 |
@@ -48,6 +49,13 @@
 | 0.1.2           | 26/05/2016 |
 | 0.1.1           | 03/04/2016 |
 | 0.1.0           | 28/03/2016 |
+
+### v0.5.5
+```
+- Support node name attribute.
+- Allow to turn versioning on/off.
+- Add mechanism to set relay buffer size through configuration.
+```
 
 ### v0.5.4
 ```

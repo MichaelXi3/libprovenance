@@ -1,17 +1,18 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
-*
-* Author: Thomas Pasquier <thomas.pasquier@bristol.ac.uk>
-*
-* Copyright (C) 2015-2016 University of Cambridge
-* Copyright (C) 2016-2017 Harvard University
-* Copyright (C) 2017-2018 University of Cambridge
-* Copyright (C) 2018-202O University of Bristol
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License version 2, as
-* published by the Free Software Foundation.
-*
-*/
+ * Copyright (C) 2015-2016 University of Cambridge,
+ * Copyright (C) 2016-2017 Harvard University,
+ * Copyright (C) 2017-2018 University of Cambridge,
+ * Copyright (C) 2018-2021 University of Bristol,
+ * Copyright (C) 2021-2022 University of British Columbia
+ *
+ * Author: Thomas Pasquier <tfjmp@cs.ubc.ca>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2, as
+ * published by the Free Software Foundation; either version 2 of the License,
+ * or (at your option) any later version.
+ */
 #ifndef __PROVENANCELIB_H
 #define __PROVENANCELIB_H
 
@@ -29,7 +30,7 @@
 
 #define PROVLIB_VERSION_MAJOR 0
 #define PROVLIB_VERSION_MINOR 5
-#define PROVLIB_VERSION_PATCH 4
+#define PROVLIB_VERSION_PATCH 5
 #define PROVLIB_VERSION_STR   "v"xstr(PROVLIB_VERSION_MAJOR)\
     "."xstr(PROVLIB_VERSION_MINOR)\
     "."xstr(PROVLIB_VERSION_PATCH)\
@@ -94,6 +95,12 @@ bool provenance_was_written(void);
 */
 int provenance_relay_register(struct provenance_ops* ops);
 
+/* stat the relay */
+int provenance_relay_start(uint32_t prov_boot_id,
+                            uint32_t machine_id,
+                            uint32_t buff_exp,
+                            uint32_t subuf_nb);
+
 /*
 * shutdown tightly the things that are running behind the scene.
 */
@@ -125,6 +132,18 @@ int provenance_set_all(bool v);
 * return either or not provenance on all kernel object is active.
 */
 bool provenance_get_all(void);
+
+
+/*
+* @v boolean value
+* if true have version, if false no version
+*/
+int provenance_should_version(bool v);
+
+/*
+* return either or not nodes versions are enable.
+*/
+bool provenance_does_version(void);
 
 /*
 * @v boolean value
@@ -201,24 +220,10 @@ bool provenance_get_propagate(void);
 int provenance_taint(uint64_t taint);
 
 /*
-* @v uint32_t value
-* Assign an ID to the current machine. Will fail if the current process is not
-* root.
-*/
-int provenance_set_machine_id(uint32_t v);
-
-/*
 * @v pointer to uint32_t value
 * Read the machine ID corresponding to the current machine.
 */
 int provenance_get_machine_id(uint32_t* v);
-
-/*
-* @v uint32_t value
-* Assign an ID to the current boot. Will fail if the current process is not
-* root.
-*/
-int provenance_set_boot_id(uint32_t v);
 
 /*
 * @v pointer to uint32_t value
@@ -401,6 +406,8 @@ int provenance_policy_hash(uint8_t* buffer, size_t length);
 
 char* relation_id_to_str(uint64_t id);
 char* node_id_to_str(uint64_t id);
+char* name_id_to_str(union prov_identifier* name_id);
+int nash_init(void);
 
 uint64_t relation_str_to_id(const char* name, uint32_t len);
 uint64_t node_str_to_id(const char* name, uint32_t len);
@@ -429,8 +436,8 @@ void disclose_derives(entity_t from, entity_t to);
 void disclose_generates(activity_t from, entity_t to);
 void disclose_uses(entity_t from, activity_t to);
 void disclose_informs(activity_t from, activity_t to);
-void disclose_influences(uint64_t activity_t, uint64_t agent_t);
-void disclose_associates(uint64_t agent_t, uint64_t activity_t);
+void disclose_influences(activity_t ac, agent_t ag);
+void disclose_associates(agent_t ag, activity_t ac);
 
 entity_t disclose_get_file(const char *path);
 

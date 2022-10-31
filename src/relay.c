@@ -1,17 +1,18 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
-*
-* Author: Thomas Pasquier <thomas.pasquier@bristol.ac.uk>
-*
-* Copyright (C) 2015-2016 University of Cambridge
-* Copyright (C) 2016-2017 Harvard University
-* Copyright (C) 2017-2018 University of Cambridge
-* Copyright (C) 2018-202O University of Bristol
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License version 2, as
-* published by the Free Software Foundation.
-*
-*/
+ * Copyright (C) 2015-2016 University of Cambridge,
+ * Copyright (C) 2016-2017 Harvard University,
+ * Copyright (C) 2017-2018 University of Cambridge,
+ * Copyright (C) 2018-2021 University of Bristol,
+ * Copyright (C) 2021-2022 University of British Columbia
+ *
+ * Author: Thomas Pasquier <tfjmp@cs.ubc.ca>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2, as
+ * published by the Free Software Foundation; either version 2 of the License,
+ * or (at your option) any later version.
+ */
 #define _GNU_SOURCE
 #include <sys/stat.h>
 #include <sys/poll.h>
@@ -25,6 +26,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <linux/provenance_types.h>
+#include <uthash.h>
 
 #include "thpool.h"
 #include "provenance.h"
@@ -52,6 +54,61 @@ static void callback_job(void* data, const size_t prov_size);
 static void long_callback_job(void* data, const size_t prov_size);
 static void reader_job(void *data);
 static void long_reader_job(void *data);
+
+struct nameentry {
+    union prov_identifier id;
+    char str[PATH_MAX];
+    UT_hash_handle hh; /* makes this structure hashable */
+};
+
+static struct nameentry *nhash = NULL;
+pthread_mutex_t nash_lock;
+
+int nash_init(void) {
+  if (pthread_mutex_init(&nash_lock, NULL) != 0)
+    return -1;
+  return 0;
+}
+
+bool name_exists_entry(union prov_identifier *nameid) {
+  struct nameentry *te=NULL;
+  pthread_mutex_lock(&nash_lock);
+  HASH_FIND(hh, nhash, nameid, sizeof(union prov_identifier), te);
+  pthread_mutex_unlock(&nash_lock);
+  if(!te)
+    return false;
+  return true;
+}
+
+static void name_add_entry(union prov_identifier *nameid, const char* name){
+  struct nameentry *te;
+  if( name_exists_entry(nameid) )
+    return;
+  te = malloc(sizeof(struct nameentry));
+  memcpy(&te->id, nameid, sizeof(union prov_identifier));
+  strncpy(te->str, name, PATH_MAX);
+  pthread_mutex_lock(&nash_lock);
+  HASH_ADD(hh, nhash, id, sizeof(union prov_identifier), te);
+  pthread_mutex_unlock(&nash_lock);
+}
+
+bool name_find_entry(union prov_identifier *nameid, char* name) {
+  struct nameentry *te=NULL;
+  pthread_mutex_lock(&nash_lock);
+  HASH_FIND(hh, nhash, nameid, sizeof(union prov_identifier), te);
+  pthread_mutex_unlock(&nash_lock);
+  if(!te)
+    return false;
+  strncpy(name, te->str, PATH_MAX);
+  return true;
+}
+
+static __thread char __name_id[PATH_MAX];
+char* name_id_to_str(union prov_identifier* name_id) {
+  if (!name_find_entry(name_id, __name_id))
+    return NULL;
+  return __name_id;
+}
 
 static inline void record_error(const char* fmt, ...){
   char tmp[2048];
@@ -103,6 +160,9 @@ int provenance_relay_register(struct provenance_ops* ops)
   }
 
   if(provenance_record_pid() < 0)
+    return -1;
+
+  if(nash_init() < 0)
     return -1;
   return 0;
 }
@@ -296,6 +356,7 @@ void long_prov_record(union long_prov_elt* msg){
         prov_ops.log_str(&(msg->str_info));
       break;
     case ENT_PATH:
+      name_add_entry(&(msg->file_name_info.identifier), msg->file_name_info.name);
       if(prov_ops.log_file_name!=NULL)
         prov_ops.log_file_name(&(msg->file_name_info));
       break;

@@ -1,17 +1,18 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
-*
-* Author: Thomas Pasquier <thomas.pasquier@bristol.ac.uk>
-*
-* Copyright (C) 2015-2016 University of Cambridge
-* Copyright (C) 2016-2017 Harvard University
-* Copyright (C) 2017-2018 University of Cambridge
-* Copyright (C) 2018-202O University of Bristol
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License version 2, as
-* published by the Free Software Foundation.
-*
-*/
+ * Copyright (C) 2015-2016 University of Cambridge,
+ * Copyright (C) 2016-2017 Harvard University,
+ * Copyright (C) 2017-2018 University of Cambridge,
+ * Copyright (C) 2018-2021 University of Bristol,
+ * Copyright (C) 2021-2022 University of British Columbia
+ *
+ * Author: Thomas Pasquier <tfjmp@cs.ubc.ca>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2, as
+ * published by the Free Software Foundation; either version 2 of the License,
+ * or (at your option) any later version.
+ */
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -90,6 +91,7 @@ static inline void __init_relation(char* type,
 
 #define NODE_START(type) ID_ENCODE(n->identifier.buffer, PROV_IDENTIFIER_BUFFER_LENGTH, id, PROV_ID_STR_LEN);\
                     __init_node(type, id, &(n->identifier.node_id));\
+                    __add_name_id(&(n->name_id), true);\
                     __add_uint64hex_attribute("cf:taint", n->taint, true);\
                     __add_uint64_attribute("cf:jiffies", n->jiffies, true);\
                     __add_uint32_attribute("cf:epoch", n->epoch, true);
